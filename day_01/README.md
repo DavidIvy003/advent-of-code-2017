@@ -24,4 +24,4 @@ For example:
 `./inverse_captch.rb <input>`
 
 # Running Tests
-`./inverse_captch.rb <input>`
+`rake`
