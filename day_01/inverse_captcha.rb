@@ -3,26 +3,26 @@
 class InverseCaptcha
   attr_accessor :digits
 
-  def initialize(number)
+  def initialize(number, half_way = false)
     @digits = number.to_s.split('')
   end
 
   def result
-    numberMatches.inject(0, :+)
+    number_matches.inject(0, :+)
   end
 
-  private def numberMatches
-    numberMatches = []
+  private def number_matches
+    matches = []
     digits.each_with_index do |digit, index|
-      nextDigit = nextDigit(index)
-      if nextDigit == digit
-        numberMatches.push(nextDigit.to_i)
+      next_digit = next_digit(index)
+      if next_digit == digit
+        matches.push(next_digit.to_i)
       end
     end
-    numberMatches
+    matches
   end
 
-  private def nextDigit(index)
+  private def next_digit(index)
     index + 1 < digits.length ? digits[index + 1] : digits.first
   end
 end
