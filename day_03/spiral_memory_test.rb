@@ -7,5 +7,6 @@ describe SpiralMemory do
     SpiralMemory.new(12).result.must_equal 3
     SpiralMemory.new(23).result.must_equal 2
     SpiralMemory.new(1024).result.must_equal 31
+    SpiralMemory.new(347991).result.must_equal 480
   end
 end
