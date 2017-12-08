@@ -4,7 +4,7 @@ class SpiralMemory
   attr_accessor :number
 
   def initialize(number)
-    @number = number
+    @number = number.to_i
   end
 
   def result
@@ -57,5 +57,5 @@ end
 
 if __FILE__ == $0
   # this will only run if the script was the main, not load'd or require'd
-  puts InverseCaptcha.new( ARGV[0] ).result
+  puts SpiralMemory.new( ARGV[0] ).result
 end
