@@ -50,27 +50,38 @@ const countGroupBy = (array) => {
   }, {});
 };
 
-const findUnbalancedProgram = (graph) => {
-  let balance;
-  Object.keys(graph).filter(child => graph[child].children.length).forEach((child) => {
-      const program = graph[child];
-      const weights = program.children.map((child) => getWeight(graph, child));
-      if (!allEqual(weights)) {
-        const groupedWeights = countGroupBy(weights);
-        const unbalancedWeight = Object.keys(groupedWeights).find((key) => groupedWeights[key] === 1);
-        const balancedWeight = Object.keys(groupedWeights).find((key) => groupedWeights[key] > 1);
-        balance = balancedWeight - unbalancedWeight;
-        console.log(weights, balancedWeight, unbalancedWeight)
-      }
-    });
-  return balance;
+const isBalanced = (graph, name) => {
+  const program = graph[name];
+  const weights = program.children.map((child) => getWeight(graph, child));
+  return allEqual(weights);
 };
+
+const hasUnbalancedChildren = (graph, programId) => {
+  const program = graph[programId];
+  return program.children.map((child => isBalanced(graph, child))).filter(a => !a).length > 0;
+};
+
+const findUnbalancedProgram = (graph) =>
+  Object.keys(graph).filter(child => graph[child].children.length).find((child) =>
+      !isBalanced(graph, child) && !hasUnbalancedChildren(graph, child));
 
 const getBottom = (graph) => Object.keys(graph).find((key) => !graph[key].parent);
 const createStructure = (fileUrl) => getStructure(getTowers(fileUrl));
 
+const weightToFixUnbalance = (graph) => {
+  const program = graph[findUnbalancedProgram(graph)];
+  const weights = program.children.map((child) => getWeight(graph, child));
+  const groupedWeights = countGroupBy(weights);
+  const unbalancedWeight = Object.keys(groupedWeights).find((key) => groupedWeights[key] === 1);
+  const balancedWeight = Object.keys(groupedWeights).find((key) => groupedWeights[key] > 1);
+  const index = weights.indexOf(+unbalancedWeight);
+  const difference = balancedWeight - unbalancedWeight;
+  const unbalancedProgramId = program.children[index];
+  return graph[unbalancedProgramId].weight + difference;
+};
+
 module.exports = {
   getBottom,
   createStructure,
-  findUnbalancedProgram,
+  weightToFixUnbalance,
 };

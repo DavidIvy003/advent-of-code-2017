@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 const recursiveCircus = require('./recursiveCircus');
-const { createStructure, findUnbalancedProgram, getBottom } = recursiveCircus;
+const { createStructure, weightToFixUnbalance, getBottom } = recursiveCircus;
 
 describe('recursiveCircus', () => {
   describe('getBottom', () => {
@@ -20,14 +20,14 @@ describe('recursiveCircus', () => {
   describe('findUnbalancedProgram', () => {
     it('finds the difference of the unbalanced program for example input', () => {
       const graph = createStructure('input/example_01.txt');
-      const value = findUnbalancedProgram(graph);
-      expect(value).to.equal(-8);
+      const value = weightToFixUnbalance(graph);
+      expect(value).to.equal(60);
     });
 
     it('gets the bottom node id for puzzle input', () => {
       const graph = createStructure('input/example_02.txt');
-      const value = findUnbalancedProgram(graph);
-      expect(value).to.equal('vmpywg');
+      const value = weightToFixUnbalance(graph);
+      expect(value).to.equal(1674);
     });
   });
 });
