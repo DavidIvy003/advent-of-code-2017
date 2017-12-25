@@ -44,6 +44,5 @@ In this example, tknk is at the bottom of the tower (the bottom program), and is
 
 Before you're ready to help them, you need to make sure your information is correct. What is the name of the bottom program?
 
-# Running
-
 # Running Tests
+`npm test`
