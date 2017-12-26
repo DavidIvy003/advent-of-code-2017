@@ -58,12 +58,18 @@ const modifyRegisters = (fileUrl) => {
   const input = fs.readFileSync(fileUrl).toString().trim();
   const instructions = input.split("\n");
   let registers = {};
+  let highestEverRegisterValue = 0;
   instructions.forEach((instruction) => {
     if (checkComparison(instruction, registers)) {
       registers = modifyRegister(instruction, registers);
+      if (highestRegisterValue(registers) > highestEverRegisterValue)
+        highestEverRegisterValue = highestRegisterValue(registers);
     }
   });
-  return registers;
+  return {
+    registers,
+    highestEverRegisterValue,
+  };
 };
 
 module.exports = {
