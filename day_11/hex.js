@@ -33,6 +33,14 @@ const fastestTravelPath = (stepsInput) => {
   return route[route.length - 1];
 };
 
+const furthestPoint = (stepsInput) => {
+  const steps = stepsInput.split(',');
+  const route = getRoute(steps);
+  console.log('route', route)
+  return Math.max(...route);
+};
+
 module.exports = {
   fastestTravelPath,
+  furthestPoint,
 };
