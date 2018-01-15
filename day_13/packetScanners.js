@@ -58,6 +58,15 @@ const getDetections = (scanners) => {
   return detections;
 };
 
+const isDetected = (scanners) =>
+  [...Array(scanners.length)].some((_, i) => {
+    if (scanners[i] && scanners[i].position === 0) {
+      return true;
+    }
+    scanners = incrementScanners(scanners);
+    return false;
+  });
+
 const calculateSeverity = (detections) =>
   detections.reduce((sum, detection) => sum + (detection.depth * detection.range), 0);
 
@@ -68,6 +77,18 @@ const getSeverity = (filename) => {
   return calculateSeverity(detections);
 };
 
+const getDelayToAvoidCapture = (filename) => {
+  const input = fs.readFileSync(filename).toString().trim();
+  let scanners = getScannersAndDepth(input);
+  let delayCount = 0;
+  while(isDetected(scanners)) {
+    scanners = incrementScanners(scanners);
+    delayCount++;
+  }
+  return delayCount;
+};
+
 module.exports = {
   getSeverity,
+  getDelayToAvoidCapture,
 };
