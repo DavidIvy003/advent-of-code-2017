@@ -18,7 +18,14 @@ describe('DancingPrograms', () => {
 
   it('runs the instructions and returns the program order', () => {
     const input = fs.readFileSync('input/puzzle_input.txt').toString().trim();
-    expect(dancingPrograms('s1,x3/4,pe/b', 'abcde')).to.equal('baedc');
-    expect(dancingPrograms(input)).to.equal('baedc');
-  }).timeout(30000); // Takes a long time to run
+    expect(dancingPrograms('s1,x3/4,pe/b', 1, 'abcde')).to.equal('baedc');
+    expect(dancingPrograms(input)).to.equal('dcmlhejnifpokgba');
+  });
+
+  it('runs the instructions repeatedly with option input', () => {
+    const input = fs.readFileSync('input/puzzle_input.txt').toString().trim();
+    expect(dancingPrograms('s1,x3/4,pe/b', 2, 'abcde')).to.equal('ceadb');
+    expect(dancingPrograms(input, 100)).to.equal('lfocdmjpbkniaehg');
+    // expect(dancingPrograms(input, 1000000000)).to.equal('ifocbejpdnklamhg');
+  });
 });

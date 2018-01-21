@@ -1,3 +1,5 @@
+let programCache = {};
+
 const processSpin = (instruction, programs) => {
   const moveCount = +instruction.slice(1).trim();
   const front = programs.slice(programs.length - moveCount, programs.length);
@@ -23,7 +25,6 @@ const processPartner = (instruction, programs) => {
   return newPrograms
 };
 
-
 const processInstruction = (instruction, programs) => {
   const type = instruction[0];
   switch(type) {
@@ -36,12 +37,31 @@ const processInstruction = (instruction, programs) => {
   }
 };
 
-const dancingPrograms = (instructionsString, programsString = 'abcdefghijklmnop') => {
+const processInstructions = (instructions, programs, i, times) => {
+  if (programCache[programs.join('')]) {
+    const next = programCache[programs.join('')];
+    const iOverride = i + (i - next.loop);
+    if (iOverride > times) return [next.output, i];
+    return [programs, iOverride - 1];
+  };
+  let processedPrograms = [...programs];
+  instructions.forEach(instruction => {
+    processedPrograms = processInstruction(instruction, processedPrograms);
+  });
+  programCache[programs.join('')] = {
+    output: processedPrograms,
+    loop: i,
+  };
+  return [processedPrograms, i];
+};
+
+const dancingPrograms = (instructionsString, times = 1, programsString = 'abcdefghijklmnop') => {
   const instructions = instructionsString.split(',');
   let programs = programsString.split('');
-  instructions.forEach(instruction => {
-    programs = processInstruction(instruction, programs);
-  });
+  programCache = {};
+  for (let i = 0; i < times; i++) {
+    [programs, i] = processInstructions(instructions, programs, i, times);
+  }
   return programs.join('');
 };
 
