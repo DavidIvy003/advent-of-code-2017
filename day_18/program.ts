@@ -1,6 +1,13 @@
 type registersType = {};
 
-class Program {
+interface ProgramType {
+  receiveCount: number;
+  sendValue: number;
+  processInstructions: Function;
+  receiveValue: Function;
+}
+
+class Program implements ProgramType {
   receiveCount: number;
   sendValue: number;
 
@@ -16,6 +23,23 @@ class Program {
     this.registers = {};
     this.registers['p'] = programId;
     this.receiveCount = 0;
+  }
+
+  processInstructions(): registersType {
+    this.running = true;
+    this.sendValue = undefined;
+    this.receiveRegister = undefined;
+    while (this.running) {
+      const instruction = this.instructions[this.currentInstruction];
+      this.registers = this.processInstruction(this.registers, instruction);
+      this.currentInstruction += 1;
+    }
+    return this.registers;
+  }
+
+  receiveValue(value) {
+    this.registers[this.receiveRegister] = value;
+    this.receiveCount += 1;
   }
 
   private value(registers, input): number {
@@ -83,23 +107,6 @@ class Program {
         throw(`Unknown action: ${action}`);
     }
   }
-
-  processInstructions(): registersType {
-    this.running = true;
-    this.sendValue = undefined;
-    this.receiveRegister = undefined;
-    while (this.running) {
-      const instruction = this.instructions[this.currentInstruction];
-      this.registers = this.processInstruction(this.registers, instruction);
-      this.currentInstruction += 1;
-    }
-    return this.registers;
-  }
-
-  receiveValue(value) {
-    this.registers[this.receiveRegister] = value;
-    this.receiveCount += 1;
-  }
 }
 
-export { Program };
+export { Program, ProgramType };

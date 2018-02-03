@@ -1,8 +1,12 @@
-import { Program } from './program';
+import { Program, ProgramType } from './program';
 
 type stackType = number[];
 
-const processProgram = (program, sendStack: stackType, receiveStack: stackType): boolean => {
+const processProgram = (
+  program: ProgramType, 
+  sendStack: stackType, 
+  receiveStack: stackType,
+): boolean => {
   program.processInstructions();
   if (program.sendValue !== undefined) {
     sendStack.push(program.sendValue);
