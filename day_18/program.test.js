@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 const fs = require('fs');
 
-const Program = require('./program').Program;
+const Program = require('./dist/program').Program;
 
 describe('Program', () => {
   it('gets the send value', () => {

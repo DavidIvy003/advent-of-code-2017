@@ -1,5 +1,16 @@
+type registersType = {};
+
 class Program {
-  constructor(instructions, programId) {
+  receiveCount: number;
+  sendValue: number;
+
+  private instructions: string;
+  private currentInstruction: number;
+  private running: boolean;
+  private receiveRegister: string;
+  private registers: registersType;
+  
+  constructor(instructions: string, programId: number) {
     this.instructions = instructions;
     this.currentInstruction = 0;
     this.registers = {};
@@ -7,53 +18,53 @@ class Program {
     this.receiveCount = 0;
   }
 
-  value(registers, input) {
+  private value(registers, input): number {
     return isNaN(input) ? registers[input] : +input;
   }
 
-  processSend(registers, left, right) {
+  private processSend(registers, left, right): registersType {
     this.sendValue = this.value(registers, left);
     this.running = false;
     return registers;
   }
 
-  processSet(registers, left, right) {
+  private processSet(registers, left, right): registersType {
     registers[left] = this.value(registers, right);
     return registers;
   }
 
-  processAdd(registers, left, right) {
+  private processAdd(registers, left, right): registersType {
     registers[left] += this.value(registers, right);
     return registers;
   }
 
-  processMultiple(registers, left, right) {
+  private processMultiple(registers, left, right): registersType {
     registers[left] *= this.value(registers, right);
     return registers;
   }
 
-  processMod(registers, left, right) {
+  private processMod(registers, left, right): registersType {
     registers[left] %= this.value(registers, right);
     return registers;
   }
 
-  processReceive(registers, left, right) {
+  private processReceive(registers, left, right): registersType {
     this.receiveRegister = left;
     this.running = false;
     return registers;
   }
 
-  processJumps(registers, left, right) {
-    if(this.value(registers, left) > 0) {
+  private processJumps(registers, left, right): registersType {
+    if (this.value(registers, left) > 0) {
       this.currentInstruction += this.value(registers, right) - 1;
     }
     return registers;
   }
 
-  processInstruction(registers, instruction) {
+  private processInstruction(registers, instruction): registersType {
     const action = instruction.slice(0, 3);
     const [left, right] = instruction.slice(3).trim().split(' ');
-    switch(action) {
+    switch (action) {
       case 'snd':
         return this.processSend(registers, left, right);
       case 'set':
@@ -73,12 +84,13 @@ class Program {
     }
   }
 
-  processInstructions() {
+  processInstructions(): registersType {
     this.running = true;
     this.sendValue = undefined;
     this.receiveRegister = undefined;
-    while(this.running) {
-      this.registers = this.processInstruction(this.registers, this.instructions[this.currentInstruction]);
+    while (this.running) {
+      const instruction = this.instructions[this.currentInstruction];
+      this.registers = this.processInstruction(this.registers, instruction);
       this.currentInstruction += 1;
     }
     return this.registers;
@@ -86,10 +98,8 @@ class Program {
 
   receiveValue(value) {
     this.registers[this.receiveRegister] = value;
-    this.receiveCount++;
+    this.receiveCount += 1;
   }
 }
 
-module.exports = {
-  Program,
-};
+export { Program };

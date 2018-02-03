@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 const fs = require('fs');
 
-const Duet = require('./duet').duet;
+const Duet = require('./dist/duet').duet;
 
 describe('Duet', () => {
   it('finds the number of values sent by the second program', () => {
