@@ -1,90 +1,30 @@
-const fs = require('fs');
+const Program = require('./program').Program;
 
-class Duet {
-  constructor(filename) {
-    this.instructions = fs.readFileSync(filename).toString().split("\n");
-    this.lastFrequency = 0;
-    this.running = true;
-    this.currentInstruction = 0;
-    this.processInstructions()
+const processProgram = (program, sendStack, receiveStack) => {
+  program.processInstructions();
+  if(program.sendValue !== undefined) {
+    sendStack.push(program.sendValue);
+  } else if(receiveStack.length) {
+    program.receiveValue(receiveStack.shift());
+  } else {
+    return true;
   }
+  return false;
+};
 
-  value(registers, input) {
-    return isNaN(input) ? registers[input] : +input;
+const duet = (instructions) => {
+  const program1 = new Program(instructions, 0);
+  const program2 = new Program(instructions, 1);
+  let program1Stack = [];
+  let program2Stack = [];
+  let deadlock1 = deadlock2 = false;
+  while(!deadlock1 && !deadlock2) {
+    deadlock1 = processProgram(program1, program1Stack, program2Stack);
+    deadlock2 = processProgram(program2, program2Stack, program1Stack);
   }
-
-  processSound(registers, left, right) {
-    this.lastFrequency = this.value(registers, left);
-    return registers;
-  }
-
-  processSet(registers, left, right) {
-    registers[left] = this.value(registers, right);
-    return registers;
-  }
-
-  processAdd(registers, left, right) {
-    registers[left] += this.value(registers, right);
-    return registers;
-  }
-
-  processMultiple(registers, left, right) {
-    registers[left] *= this.value(registers, right);
-    return registers;
-  }
-
-  processMod(registers, left, right) {
-    registers[left] %= this.value(registers, right);
-    return registers;
-  }
-
-  processRecovers(registers, left, right) {
-    if(this.value(registers, left)) {
-      this.running = false;
-    }
-    return registers;
-  }
-
-  processJumps(registers, left, right) {
-    if(this.value(registers, left) > 0) {
-      this.currentInstruction += this.value(registers, right) - 1;
-    }
-    return registers;
-  }
-
-  processInstruction(registers, instruction) {
-    const action = instruction.slice(0, 3);
-    const [left, right] = instruction.slice(3).trim().split(' ');
-    switch(action) {
-      case 'snd':
-        return this.processSound(registers, left, right);
-      case 'set':
-        return this.processSet(registers, left, right);
-      case 'add':
-        return this.processAdd(registers, left, right);
-      case 'mul':
-        return this.processMultiple(registers, left, right);
-      case 'mod':
-        return this.processMod(registers, left, right);
-      case 'rcv':
-        return this.processRecovers(registers, left, right);
-      case 'jgz':
-        return this.processJumps(registers, left, right);
-      default:
-        throw(`Unknown action: ${action}`);
-    }
-  }
-
-  processInstructions() {
-    let registers = {};
-    while(this.running) {
-      registers = this.processInstruction(registers, this.instructions[this.currentInstruction]);
-      this.currentInstruction += 1;
-    }
-    return registers;
-  }
-}
+  return program1.receiveCount;
+};
 
 module.exports = {
-  Duet,
+  duet,
 };

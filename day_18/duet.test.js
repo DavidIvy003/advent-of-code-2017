@@ -1,11 +1,13 @@
 const expect = require('chai').expect;
 const fs = require('fs');
 
-const Duet = require('./duet').Duet;
+const Duet = require('./duet').duet;
 
 describe('Duet', () => {
-  it('gets last frequency', () => {
-    expect(new Duet('input/example_01.txt').lastFrequency).to.equal(4);
-    expect(new Duet('input/example_02.txt').lastFrequency).to.equal(7071);
+  it('finds the number of values sent by the second program', () => {
+    const testInstructions = fs.readFileSync('input/example_03.txt').toString().split("\n");
+    const puzzleInstructions = fs.readFileSync('input/example_02.txt').toString().split("\n");
+    expect(Duet(testInstructions)).to.equal(3);
+    expect(Duet(puzzleInstructions)).to.equal(8001);
   });
 });
