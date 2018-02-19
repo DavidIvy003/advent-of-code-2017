@@ -17,7 +17,9 @@ const LEFT = 'left';
 const RIGHT = 'right';
 const END = 'end';
 
-const getStart = (grid: gridType) => grid[0].findIndex((cell: string): boolean => cell === '|');
+const getGrid = (input: string): gridType => input.split('\n').map(row => row.split(''));
+const getStart = (grid: gridType): number => 
+  grid[0].findIndex((cell: string): boolean => cell === '|');
 const getPoint = (grid: gridType, x: number, y: number): string => grid[y] && grid[y][x];
 
 const getNextPoint = ({ direction, point: { x, y } }: stateType): number[] => {  
@@ -81,16 +83,16 @@ const getNextState = (grid: gridType, state: stateType): stateType => {
   return state;
 };
 
+const getInitialState = (grid: gridType): stateType => ({
+  direction: DOWN,
+  point: { x: getStart(grid), y: 0 },
+  path: [],
+  running: true,
+});
+
 const getPath = (input: string): string => {
-  const grid = input.split('\n').map(row => row.split(''));
-  const startingPoint = getStart(grid);
-  
-  let state = {
-    direction: DOWN, 
-    point: { x: startingPoint, y: 0 }, 
-    path: [],
-    running: true,
-  };
+  const grid = getGrid(input);
+  let state = getInitialState(grid);
 
   while (state.running) {
     state = getNextState(grid, state);
@@ -98,6 +100,19 @@ const getPath = (input: string): string => {
   return state.path.join('');
 };
 
+const getStepCount = (input: string): number => {
+  const grid = getGrid(input);
+  let state = getInitialState(grid);
+  let counter = 0;
+
+  while (state.running) {
+    state = getNextState(grid, state);
+    counter += 1;
+  }
+  return counter;
+};
+
 export { 
   getPath,
+  getStepCount,
 };

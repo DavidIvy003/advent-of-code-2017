@@ -3,6 +3,7 @@ const fs = require('fs');
 
 const {
   getPath,
+  getStepCount,
 } = require('./dist/tubes');
 
 describe('getPath', () => {
@@ -34,5 +35,17 @@ describe('getPath', () => {
   it('can handle puzzle input', () => {
     const testInstructions = fs.readFileSync('input/example_02.txt').toString();
     expect(getPath(testInstructions)).to.equal('PVBSCMEQHY');
+  });
+});
+
+describe('getStepCount', () => {
+  it('can cross over other tubes', () => {
+    const testInstructions = fs.readFileSync('input/example_01.txt').toString();
+    expect(getStepCount(testInstructions)).to.equal(38);
+  });
+
+  it('can handle puzzle input', () => {
+    const testInstructions = fs.readFileSync('input/example_02.txt').toString();
+    expect(getStepCount(testInstructions)).to.equal(17736);
   });
 });

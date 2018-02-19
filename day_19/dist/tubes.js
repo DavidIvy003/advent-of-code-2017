@@ -5,6 +5,7 @@ const UP = 'up';
 const LEFT = 'left';
 const RIGHT = 'right';
 const END = 'end';
+const getGrid = (input) => input.split('\n').map(row => row.split(''));
 const getStart = (grid) => grid[0].findIndex((cell) => cell === '|');
 const getPoint = (grid, x, y) => grid[y] && grid[y][x];
 const getNextPoint = ({ direction, point: { x, y } }) => {
@@ -43,19 +44,30 @@ const getNextState = (grid, state) => {
     }
     return state;
 };
+const getInitialState = (grid) => ({
+    direction: DOWN,
+    point: { x: getStart(grid), y: 0 },
+    path: [],
+    running: true,
+});
 const getPath = (input) => {
-    const grid = input.split('\n').map(row => row.split(''));
-    const startingPoint = getStart(grid);
-    let state = {
-        direction: DOWN,
-        point: { x: startingPoint, y: 0 },
-        path: [],
-        running: true,
-    };
+    const grid = getGrid(input);
+    let state = getInitialState(grid);
     while (state.running) {
         state = getNextState(grid, state);
     }
     return state.path.join('');
 };
 exports.getPath = getPath;
+const getStepCount = (input) => {
+    const grid = getGrid(input);
+    let state = getInitialState(grid);
+    let counter = 0;
+    while (state.running) {
+        state = getNextState(grid, state);
+        counter += 1;
+    }
+    return counter;
+};
+exports.getStepCount = getStepCount;
 //# sourceMappingURL=tubes.js.map
