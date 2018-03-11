@@ -25,13 +25,6 @@ describe('Fractal Art', () => {
       const testOutput = fs.readFileSync('input/puzzle_output.txt').toString();
       expect(getFractalArtOuput(testInstructions)).to.equal(testOutput);
     });
-
-    it.skip('iterates the art from puzzle input for 18 iterations', () => {
-      // This test takes forever to run, don't do it
-      const testInstructions = fs.readFileSync('input/puzzle_input.txt').toString();
-      const testOutput = fs.readFileSync('input/puzzle_output.txt').toString();
-      expect(getFractalArtOuput(testInstructions, 18)).to.equal(1277716);
-    });
   });
 
   describe('countOnPixels', () => {
@@ -49,6 +42,12 @@ describe('Fractal Art', () => {
       const input = fs.readFileSync('input/puzzle_output.txt').toString();
       expect(countOnPixels(input)).to.equal(110);
     });
+
+    it('counts the number of one pixels puzzle input for 18 iterations', () => {
+      const testInstructions = fs.readFileSync('input/puzzle_input.txt').toString();
+      const testOutput = fs.readFileSync('input/puzzle_output.txt').toString();
+      expect(countOnPixels(getFractalArtOuput(testInstructions, 18))).to.equal(1277716);
+    }).timeout(10000); // Takes about 6s to run
   });
 });
 
