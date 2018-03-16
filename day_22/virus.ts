@@ -1,95 +1,105 @@
-type nodesType = nodeType[];
-type directionType = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT';
+import { 
+  healthType, 
+  directionType,
+  positionType,
+  nodeType,
+  nodesType,
+  stateType,
+} from './virus.types';
 
-interface positionType {
-  x: number;
-  y: number;
-};
+const UP = directionType.Up;
+const DOWN = directionType.Down;
+const LEFT = directionType.Left;
+const RIGHT = directionType.Right;
 
-interface nodeType {
-  position: positionType;
-}
-
-interface stateType {
-  nodes: nodesType;
-  current: positionType;
-  direction: directionType;
-  stats: {
-    infections: number;
-    cleans: number;
-  }
-}
-
-const UP = 'UP';
-const DOWN = 'DOWN';
-const LEFT = 'LEFT';
-const RIGHT = 'RIGHT';
+const CLEAN = healthType.CLEAN;
+const WEAKENED = healthType.WEAKENED;
+const INFECTED = healthType.INFECTED;
+const FLAGGED = healthType.FLAGGED;
 
 const TURN_OPTIONS = {
-  infected: {
+  INFECTED: {
     UP: RIGHT,
     RIGHT: DOWN,
     DOWN: LEFT,
     LEFT: UP,
   },
-  clean: {
+  WEAKENED: {
+    UP: UP,
+    LEFT: LEFT,
+    DOWN: DOWN,
+    RIGHT: RIGHT,
+  },
+  CLEAN: {
     UP: LEFT,
     LEFT: DOWN,
     DOWN: RIGHT,
     RIGHT: UP,
   },
+  FLAGGED: {
+    UP: DOWN,
+    LEFT: RIGHT,
+    DOWN: UP,
+    RIGHT: LEFT,
+  },
 };
 
-const isNodeInfected = (nodes: nodesType, nodex: number, nodey: number): boolean =>
-  !!nodes.find(({ position: { x, y } }) => nodex === x && nodey === y);
-
-const getNextDirection = (currentDirection: directionType, infected: boolean): directionType =>
-  TURN_OPTIONS[infected ? 'infected' : 'clean'][currentDirection];
-
-const getNextNode = (direction: directionType, { x, y }: positionType): positionType => {
-  switch(direction) {
-    case UP:
-      return {
-        x,
-        y: y + 1,
-      };
-    case DOWN:
-      return {
-        x,
-        y: y - 1,
-      };
-    case LEFT:
-      return {
-        x: x - 1,
-        y,
-      };
-    case RIGHT:
-      return {
-        x: x + 1,
-        y,
-      };
-  } 
+const NEXT_HEALTH = {
+  CLEAN: INFECTED,
+  INFECTED: CLEAN,
 };
 
-const getNextNodes = (nodes: nodesType, infect: boolean, current: positionType): nodesType =>
-  infect ? 
-    [...nodes, { position: current }] :
-    nodes.filter(({ position: { x, y } }) => !(x === current.x && y === current.y));
+const EVOLVES_NEXT_HEALTH = {
+  CLEAN: WEAKENED,
+  WEAKENED: INFECTED,
+  INFECTED: FLAGGED,
+  FLAGGED: CLEAN,
+};
+
+const MOVEMENTS = {
+  UP: { deltax: 0, deltay: 1 },
+  DOWN: { deltax: 0, deltay: -1 },
+  LEFT: { deltax: -1, deltay: 0 },
+  RIGHT: { deltax: 1, deltay: 0 },
+};
+
+const getNode = (nodes: nodesType, nodex: number, nodey: number): nodeType =>
+  (nodes[`${nodex},${nodey}`] || { health: CLEAN });
+
+const createNode = (nodes: nodesType, nodex: number, nodey: number, health: healthType): nodesType =>
+  health === CLEAN ? { ...nodes } : ({ ...nodes, [`${nodex},${nodey}`]: { health } });
+
+const getNodeHealth = (nodes: nodesType, nodex: number, nodey: number): healthType =>
+  getNode(nodes, nodex, nodey).health;
+
+const getNextNodeHealth = (currentHealth: healthType, evolves: boolean): healthType =>
+  (evolves ? EVOLVES_NEXT_HEALTH : NEXT_HEALTH)[currentHealth];
+
+const getNextDirection = (currentDirection: directionType, health: healthType): directionType =>
+  TURN_OPTIONS[health][currentDirection];
+
+const getNextNode = (direction: directionType, { x, y }: positionType): positionType => ({
+    x: x + MOVEMENTS[direction].deltax,
+    y: y + MOVEMENTS[direction].deltay,
+  });
+
+const getNextNodes = (nodes: nodesType, health: healthType, current: positionType): nodesType => {
+  if (health === CLEAN) {
+    delete nodes[`${current.x},${current.y}`];
+  } else {
+    nodes[`${current.x},${current.y}`] = { health };
+  }
+  return nodes;
+};
 
 const getInitalState = (input: string): stateType => {
   const grid = input.split('\n').map((row: string) => row.split(''));
   const midY = Math.trunc(grid.length / 2);
   const midX = Math.trunc(grid[0].length / 2);
-  const nodes = [];
+  let nodes = {};
   grid.reverse().forEach((row: string[], y: number) => {
     row.forEach((node: string, x: number) => {
-      if (node === '#')
-        nodes.push({
-          position: {
-            x: x - midX, 
-            y: y - midY, 
-          },
-        });
+      nodes = createNode(nodes, x - midX, y - midY, node === '#' ? INFECTED : CLEAN);
     });
   });
   return {
@@ -101,30 +111,29 @@ const getInitalState = (input: string): stateType => {
     direction: UP,
     stats: {
       infections: 0,
-      cleans: 0,
-    }
+    },
   };
 };
 
-const getNextState = (state: stateType): stateType => {
-  const currentInfected = isNodeInfected(state.nodes, state.current.x, state.current.y);
-  const nextDirection = getNextDirection(state.direction, currentInfected);
+const getNextState = (evolves: boolean) => (state: stateType, i): stateType => {
+  const nodeHealth = getNodeHealth(state.nodes, state.current.x, state.current.y);
+  const nextNodeHealth = getNextNodeHealth(nodeHealth, evolves);  
+  const nextDirection = getNextDirection(state.direction, nodeHealth);
   const nextNode = getNextNode(nextDirection, state.current);
-  const nextNodes = getNextNodes(state.nodes, !currentInfected, state.current);
+  const nextNodes = getNextNodes(state.nodes, nextNodeHealth, state.current);
 
   return {
     nodes: nextNodes,
     direction: nextDirection,
     current: nextNode,
     stats: {
-      infections: currentInfected ? state.stats.infections : state.stats.infections + 1,
-      cleans: currentInfected ? state.stats.cleans + 1 : state.stats.cleans,
+      infections: nextNodeHealth === INFECTED ? state.stats.infections + 1 : state.stats.infections,
     }
   };
 };
 
-const getVirusStateAfterIterations = (input: string, interations: number = 10000) =>
-  [...Array(interations).keys()].reduce(getNextState, getInitalState(input));
+const getVirusStateAfterIterations = (input: string, interations: number = 10000, evolves: boolean = false) =>
+  [...Array(interations).keys()].reduce(getNextState(evolves), getInitalState(input));
 
 export { 
   getVirusStateAfterIterations,

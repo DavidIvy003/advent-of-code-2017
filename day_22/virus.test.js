@@ -10,16 +10,15 @@ describe('Sporifica Virus', () => {
     it('gets the state after 1 iteration', () => {
       const testInstructions = fs.readFileSync('input/example_01.txt').toString();
       const expected = {
-        nodes: [
-          { position: { x: -1, y: 0 }}, 
-          { position: { x: 1, y: 1 }},
-          { position: { x: 0, y: 0 } },
-        ],
+        nodes: {
+          '-1,0': { health: 'INFECTED' }, 
+          '1,1': { health: 'INFECTED' }, 
+          '0,0': { health: 'INFECTED' }, 
+        },
         direction: 'LEFT',
         current: { x: -1, y: 0 },
         stats: {
           infections: 1,
-          cleans: 0,
         },
       }
       expect(getVirusStateAfterIterations(testInstructions, 1)).to.deep.equal(expected);
@@ -28,18 +27,17 @@ describe('Sporifica Virus', () => {
     it('gets the state after 5 iteration', () => {
       const testInstructions = fs.readFileSync('input/example_01.txt').toString();
       const expected = {
-        nodes: [
-          { position: { x: 1, y: 1 }},
-          { position: { x: 0, y: 0 } },
-          { position: { x: -2, y: 1 } }, 
-          { position: { x: -2, y: 0 } }, 
-          { position: { x: -1, y: 0 } }, 
-        ],
+        nodes: {
+          '1,1': { health: 'INFECTED' },
+          '0,0': { health: 'INFECTED' },
+          '-2,1': { health: 'INFECTED' },
+          '-2,0': { health: 'INFECTED' },
+          '-1,0': { health: 'INFECTED' },
+        },
         direction: 'RIGHT',
         current: { x: 0, y: 1 },
         stats: {
           infections: 5,
-          cleans: 2,
         },
       }
       expect(getVirusStateAfterIterations(testInstructions, 7)).to.deep.equal(expected);
@@ -60,8 +58,26 @@ describe('Sporifica Virus', () => {
     it('counts the infections of 10000 iterations of puzzle input', () => {
       const testInstructions = fs.readFileSync('input/puzzle_input.txt').toString();
       const output = getVirusStateAfterIterations(testInstructions, 10000);
-      expect(output.stats.infections).to.deep.equal(5587);
+      expect(output.stats.infections).to.deep.equal(5182);
     });
+
+    it('counts the infections of 10000 iterations', () => {
+      const testInstructions = fs.readFileSync('input/example_01.txt').toString();
+      const output = getVirusStateAfterIterations(testInstructions, 100, true);
+      expect(output.stats.infections).to.deep.equal(26);
+    });
+
+    it('counts the infections of 10000000 iterations of puzzle input which evolves', () => {
+      const testInstructions = fs.readFileSync('input/example_01.txt').toString();
+      const output = getVirusStateAfterIterations(testInstructions, 10000000, true);
+      expect(output.stats.infections).to.deep.equal(2511944);
+    }).timeout(10000);
+
+    it('counts the infections of 10000000 iterations of puzzle input which evolves', () => {
+      const testInstructions = fs.readFileSync('input/puzzle_input.txt').toString();
+      const output = getVirusStateAfterIterations(testInstructions, 10000000, true);
+      expect(output.stats.infections).to.deep.equal(2512008);
+    }).timeout(10000);
   });
 });
 
