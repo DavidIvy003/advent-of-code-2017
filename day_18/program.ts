@@ -1,6 +1,6 @@
-type registersType = {
+interface registersType {
   [key: string]: number;
-};
+}
 
 interface ProgramType {
   receiveCount: number;
@@ -18,7 +18,7 @@ class Program implements ProgramType {
   private running: boolean;
   private receiveRegister: string;
   private registers: registersType;
-  
+
   constructor(instructions: string, programId: number) {
     this.instructions = instructions;
     this.currentInstruction = 0;
