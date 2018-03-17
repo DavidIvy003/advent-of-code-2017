@@ -1,4 +1,6 @@
-type registersType = {};
+type registersType = {
+  [key: string]: number;
+};
 
 interface ProgramType {
   receiveCount: number;
@@ -37,55 +39,55 @@ class Program implements ProgramType {
     return this.registers;
   }
 
-  receiveValue(value) {
+  receiveValue(value: number) {
     this.registers[this.receiveRegister] = value;
     this.receiveCount += 1;
   }
 
-  private value(registers, input): number {
-    return isNaN(input) ? registers[input] : +input;
+  private value(registers: registersType, input: string): number {
+    return isNaN(+input) ? registers[input] : +input;
   }
 
-  private processSend(registers, left, right): registersType {
+  private processSend(registers: registersType, left: string, right: string): registersType {
     this.sendValue = this.value(registers, left);
     this.running = false;
     return registers;
   }
 
-  private processSet(registers, left, right): registersType {
+  private processSet(registers: registersType, left: string, right: string): registersType {
     registers[left] = this.value(registers, right);
     return registers;
   }
 
-  private processAdd(registers, left, right): registersType {
+  private processAdd(registers: registersType, left: string, right: string): registersType {
     registers[left] += this.value(registers, right);
     return registers;
   }
 
-  private processMultiple(registers, left, right): registersType {
+  private processMultiple(registers: registersType, left: string, right: string): registersType {
     registers[left] *= this.value(registers, right);
     return registers;
   }
 
-  private processMod(registers, left, right): registersType {
+  private processMod(registers: registersType, left: string, right: string): registersType {
     registers[left] %= this.value(registers, right);
     return registers;
   }
 
-  private processReceive(registers, left, right): registersType {
+  private processReceive(registers: registersType, left: string, right: string): registersType {
     this.receiveRegister = left;
     this.running = false;
     return registers;
   }
 
-  private processJumps(registers, left, right): registersType {
+  private processJumps(registers: registersType, left: string, right: string): registersType {
     if (this.value(registers, left) > 0) {
       this.currentInstruction += this.value(registers, right) - 1;
     }
     return registers;
   }
 
-  private processInstruction(registers, instruction): registersType {
+  private processInstruction(registers: registersType, instruction: string): registersType {
     const action = instruction.slice(0, 3);
     const [left, right] = instruction.slice(3).trim().split(' ');
     switch (action) {
