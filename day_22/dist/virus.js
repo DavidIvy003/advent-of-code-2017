@@ -17,10 +17,10 @@ const TURN_OPTIONS = {
         LEFT: UP,
     },
     WEAKENED: {
-        UP: UP,
-        LEFT: LEFT,
-        DOWN: DOWN,
-        RIGHT: RIGHT,
+        UP,
+        LEFT,
+        DOWN,
+        RIGHT,
     },
     CLEAN: {
         UP: LEFT,
@@ -103,7 +103,7 @@ const getNextState = (evolves) => (state, i) => {
         current: nextNode,
         stats: {
             infections: nextNodeHealth === INFECTED ? state.stats.infections + 1 : state.stats.infections,
-        }
+        },
     };
 };
 const getVirusStateAfterIterations = (input, interations = 10000, evolves = false) => [...Array(interations).keys()].reduce(getNextState(evolves), getInitalState(input));

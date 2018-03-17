@@ -25,10 +25,10 @@ const TURN_OPTIONS = {
     LEFT: UP,
   },
   WEAKENED: {
-    UP: UP,
-    LEFT: LEFT,
-    DOWN: DOWN,
-    RIGHT: RIGHT,
+    UP,
+    LEFT,
+    DOWN,
+    RIGHT,
   },
   CLEAN: {
     UP: LEFT,
@@ -66,7 +66,12 @@ const MOVEMENTS = {
 const getNode = (nodes: nodesType, nodex: number, nodey: number): nodeType =>
   (nodes[`${nodex},${nodey}`] || { health: CLEAN });
 
-const createNode = (nodes: nodesType, nodex: number, nodey: number, health: healthType): nodesType =>
+const createNode = (
+  nodes: nodesType, 
+  nodex: number, 
+  nodey: number, 
+  health: healthType,
+): nodesType =>
   health === CLEAN ? { ...nodes } : ({ ...nodes, [`${nodex},${nodey}`]: { health } });
 
 const getNodeHealth = (nodes: nodesType, nodex: number, nodey: number): healthType =>
@@ -79,9 +84,9 @@ const getNextDirection = (currentDirection: directionType, health: healthType): 
   TURN_OPTIONS[health][currentDirection];
 
 const getNextNode = (direction: directionType, { x, y }: positionType): positionType => ({
-    x: x + MOVEMENTS[direction].deltax,
-    y: y + MOVEMENTS[direction].deltay,
-  });
+  x: x + MOVEMENTS[direction].deltax,
+  y: y + MOVEMENTS[direction].deltay,
+});
 
 const getNextNodes = (nodes: nodesType, health: healthType, current: positionType): nodesType => {
   if (health === CLEAN) {
@@ -128,11 +133,15 @@ const getNextState = (evolves: boolean) => (state: stateType, i): stateType => {
     current: nextNode,
     stats: {
       infections: nextNodeHealth === INFECTED ? state.stats.infections + 1 : state.stats.infections,
-    }
+    },
   };
 };
 
-const getVirusStateAfterIterations = (input: string, interations: number = 10000, evolves: boolean = false) =>
+const getVirusStateAfterIterations = (
+  input: string, 
+  interations: number = 10000, 
+  evolves: boolean = false,
+) =>
   [...Array(interations).keys()].reduce(getNextState(evolves), getInitalState(input));
 
 export { 
