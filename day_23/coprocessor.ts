@@ -54,11 +54,11 @@ const processInstruction = (state: stateType, instruction: string): stateType =>
   }
 };
 
-const processInstructions = (input: string): stateType => {
+const processInstructions = (input: string, debug: boolean = false): stateType => {
   const instructions = input.split('\n');
   let instruction;
   let state = {
-    registers: {},
+    registers: debug ? { a: 1 } : {},
     current: 0,
     stats: {
       multiplications: 0,

@@ -6,6 +6,10 @@ const {
   processInstructions,
 } = require('./dist/coprocessor');
 
+const {
+  getOutput,
+} = require('./dist/coprocessor-part2');
+
 describe('Sporifica Virus', () => {
   describe('processInstructions', () => {
     it('sets the register', () => {
@@ -55,6 +59,12 @@ describe('Sporifica Virus', () => {
       const testInstructions = fs.readFileSync('input/puzzle_input.txt').toString();
       const output = processInstructions(testInstructions);
       expect(getMultiplicationsCount(output)).to.deep.equal(8281);
+    });
+  });
+
+  describe('Part 2', () => {
+    it('gets the output', () => {
+      expect(getOutput()).to.deep.equal(911);
     });
   });
 });

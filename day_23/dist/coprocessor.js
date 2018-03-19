@@ -36,11 +36,11 @@ const processInstruction = (state, instruction) => {
             throw (`Unknown action: ${action}`);
     }
 };
-const processInstructions = (input) => {
+const processInstructions = (input, debug = false) => {
     const instructions = input.split('\n');
     let instruction;
     let state = {
-        registers: {},
+        registers: debug ? { a: 1 } : {},
         current: 0,
         stats: {
             multiplications: 0,
