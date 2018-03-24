@@ -16,10 +16,16 @@ const getNextComponents = (allComponents, pinCount) => getComponentsWithPinCount
         return [...bridgeOptions, [component]];
     return [...bridgeOptions, ...next.map((c) => [component, ...c])];
 }, []);
+const sortByStrength = (bridge1, bridge2) => getStrength(bridge2) - getStrength(bridge1);
+const sortByLength = (bridge1, bridge2) => (bridge1.length === bridge2.length) ?
+    getStrength(bridge2) - getStrength(bridge1) :
+    bridge2.length - bridge1.length;
 const getStrength = (bridge) => bridge.reduce((total, component) => total + component[0] + component[1], 0);
 exports.getStrength = getStrength;
 const getPossibleBridges = (input) => getNextComponents(getComponents(input.trim()), 0);
 exports.getPossibleBridges = getPossibleBridges;
-const getStrongestBridge = (bridges) => bridges.sort((bridge1, bridge2) => getStrength(bridge2) - getStrength(bridge1))[0];
+const getStrongestBridge = (bridges) => bridges.sort(sortByStrength)[0];
 exports.getStrongestBridge = getStrongestBridge;
+const getLongestBridge = (bridges) => bridges.sort(sortByLength)[0];
+exports.getLongestBridge = getLongestBridge;
 //# sourceMappingURL=moat.js.map

@@ -26,21 +26,35 @@ const getNextComponents = (allComponents: componentType[], pinCount: number): br
       const next = getNextComponents(removeComponent(allComponents, component), nextPin);
       if (next.length === 0)
         return [...bridgeOptions, [component]];
-      return [...bridgeOptions, ...next.map((c: componentType[]) => [component, ...c])];
+      return [...bridgeOptions, ...next.map((c: componentType[]): bridgeType => [component, ...c])];
     },
     []);
 
+const sortByStrength = (bridge1: bridgeType, bridge2: bridgeType): number =>
+  getStrength(bridge2) - getStrength(bridge1);
+
+const sortByLength = (bridge1: bridgeType, bridge2: bridgeType): number =>
+  (bridge1.length === bridge2.length) ?
+    getStrength(bridge2) - getStrength(bridge1) :
+    bridge2.length - bridge1.length;
+
 const getStrength = (bridge: bridgeType): number =>
-  bridge.reduce((total, component) => total + component[0] + component[1], 0);
+  bridge.reduce(
+    (total: number, component: componentType): number => total + component[0] + component[1],
+    0);
 
 const getPossibleBridges = (input: string): bridgeType[] =>
   getNextComponents(getComponents(input.trim()), 0);
 
 const getStrongestBridge = (bridges: bridgeType[]): bridgeType =>
-  bridges.sort((bridge1, bridge2) => getStrength(bridge2) - getStrength(bridge1))[0];
+  bridges.sort(sortByStrength)[0];
+
+const getLongestBridge = (bridges: bridgeType[]): bridgeType =>
+  bridges.sort(sortByLength)[0];
 
 export {
   getPossibleBridges,
+  getLongestBridge,
   getStrength,
   getStrongestBridge,
 };
